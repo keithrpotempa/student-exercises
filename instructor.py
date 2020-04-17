@@ -1,11 +1,9 @@
+from nssperson import NSSPerson
 
-class Instructor:
+class Instructor(NSSPerson):
   
     def __init__(self, fname, lname, slack):
-        self.fname = fname
-        self.lname = lname
-        self.slack = slack
-        self.cohort = ""
+        super().__init__(fname, lname, slack)
         self.specialtiy = ""
         
     def assign_exercise(self, student, exercise):
