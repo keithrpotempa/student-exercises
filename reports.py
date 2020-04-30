@@ -1,6 +1,7 @@
 import sqlite3
 from student import Student
 from cohort import Cohort
+from exercise import Exercise
 
 class StudentExerciseReports():
 
@@ -50,7 +51,15 @@ class StudentExerciseReports():
         query = """SELECT * FROM Cohort;"""
 
         self.report(row_factory, query)
+        
+    def all_exercises(self):
+        """Retrieve all exercises"""
+        row_factory = lambda cursor, row: Exercise(row[1], row[2])
+        query = """SELECT * FROM Exercise;"""
+        
+        self.report(row_factory, query)
 
 reports = StudentExerciseReports()
 reports.all_students()
 reports.all_cohorts()
+reports.all_exercises()
