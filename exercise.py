@@ -6,4 +6,4 @@ class Exercise:
         self.language = language
         
     def __repr__(self):
-        return f"Exercise {self.name} is in {self.language}"
+        return f"{self.name} is in {self.language}"
