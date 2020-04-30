@@ -5,3 +5,6 @@ class Cohort:
         self.name = name
         self.students = list()
         self.instructors = list()
+        
+    def __repr__(self):
+        return f"{self.name}"
