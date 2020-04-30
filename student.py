@@ -2,8 +2,9 @@ from nssperson import NSSPerson
 
 class Student(NSSPerson):
   
-    def __init__(self, fname, lname, slack):
+    def __init__(self, fname, lname, slack, cohort):
         super().__init__(fname, lname, slack)
+        self.cohort = cohort
         self.exercises = list()
         
     def student_summary(self):
@@ -15,3 +16,5 @@ class Student(NSSPerson):
         for exercise in self.exercises:
             print(f"  - {exercise.name}")
         
+    def __repr__(self):
+        return f"{self.fname} {self.lname} is in {self.cohort}"
