@@ -1,5 +1,6 @@
 import sqlite3
 from student import Student
+from cohort import Cohort
 
 class StudentExerciseReports():
 
@@ -8,17 +9,28 @@ class StudentExerciseReports():
     def __init__(self):
         self.db_path = "/home/kpotempa/workspace/student-exercises/studentexercises.db"
 
-    def all_students(self):
-
-        """Retrieve all students with the cohort name"""
-
+    def report(self, row_factory, query):
+        """ Generic report method"""
+        
         with sqlite3.connect(self.db_path) as conn:
-            conn.row_factory = lambda cursor, row: Student(
-                row[1], row[2], row[3], row[5]
-            )
+            conn.row_factory = row_factory
             db_cursor = conn.cursor()
 
-            db_cursor.execute("""
+            db_cursor.execute(query)
+
+            response = db_cursor.fetchall()
+
+            for row in response:
+                print(row)
+
+    def all_students(self):
+        """Retrieve all students with the cohort name"""
+        
+        row_factory = lambda cursor, row: Student(
+                row[1], row[2], row[3], row[5]
+            )
+        
+        query = """
             select s.Id,
                 s.FirstName,
                 s.LastName,
@@ -28,12 +40,17 @@ class StudentExerciseReports():
             from Student s
             join Cohort c on s.CohortId = c.Id
             order by s.CohortId
-            """)
+            """
 
-            all_students = db_cursor.fetchall()
+        self.report(row_factory, query)
+                
+    def all_cohorts(self):
+        """Retrieve all cohorts"""
+        row_factory = lambda cursor, row: Cohort(row[1])
+        query = """SELECT * FROM Cohort;"""
 
-            for student in all_students:
-                print(student)
+        self.report(row_factory, query)
 
 reports = StudentExerciseReports()
 reports.all_students()
+reports.all_cohorts()
