@@ -300,6 +300,83 @@ class StudentExerciseReports():
         print("========== WHO WHAT WHY ==========")
         print_results(response)
         
+    def instructors_and_students(self):
+        """Lists students and instructors for each cohort"""
+        
+        cohorts = dict()
+        
+        # Dictionary Format:
+        # {
+        #     "C38": {
+        #         "Students": [],
+        #         "Instructors": []
+        #     }
+        # }
+        
+        def build_dict(dataset, datatype):
+            for row in dataset:
+                c_name = row[0]
+                person_name = f"{row[1]} {row[2]}"
+                
+                # If the cohort doesn't exist, created it
+                if c_name not in cohorts:
+                    # Seed it with empty lists
+                    cohorts[c_name] = {"students": [], "instructors": []}
+                    # Then append the person at hand
+                    cohorts[c_name][datatype].append(person_name)
+                # If the cohort already exists
+                else:
+                    # Then just add the person at hand
+                    cohorts[c_name][datatype].append(person_name)
+        
+        def print_dict(cohort_dict):
+            # First tier of unpacking
+            for cohort, members in cohort_dict.items():
+                # Printing the name of the cohort we're on
+                print(cohort)
+                # member_type as in student or instructor
+                # members as in the list of members
+                for member_type, members in members.items():
+                    # print the type of member
+                    print(f"\t {member_type.title()}")
+                    # print the list of names
+                    for member in members:
+                        print(f"\t - {member}")
+        
+        def get_students():
+            query = """
+                SELECT
+                    c.Name AS CohortName,
+                    s.FirstName as StuFName,
+                    s.LastName AS StuLName
+                FROM Cohort c
+                JOIN Student s ON s.CohortId = c.Id
+                ORDER BY c.Id;
+            """
+            
+            row_factory = None
+            
+            return self.get_data(row_factory, query)
+        
+        def get_instructors():
+            query = """
+                SELECT
+                    c.Name AS CohortName,
+                    i.FirstName,
+                    i.LastName
+                FROM Cohort c
+                JOIN Instructor i ON i.CohortId = c.Id
+                ORDER BY c.Id;
+            """
+            
+            row_factory = None
+            
+            return self.get_data(row_factory, query)
+            
+        build_dict(get_students(), "students")
+        build_dict(get_instructors(), "instructors")
+        print("========== WHO WHAT WHY ==========")
+        print_dict(cohorts)
 
 reports = StudentExerciseReports()
 # reports.all_students()
@@ -313,4 +390,5 @@ reports = StudentExerciseReports()
 # reports.student_workload()
 # reports.assigned_exercises()
 # reports.popular_exercises()
-reports.who_what_why()
+# reports.who_what_why()
+reports.instructors_and_students()
