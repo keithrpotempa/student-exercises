@@ -220,6 +220,43 @@ class StudentExerciseReports():
         response = self.get_data(row_factory, query)
         print("========== ASSIGNED EXERCISES ==========")
         print_results(response)
+        
+    def popular_exercises(self):
+        """Lists all exercises and the students each is assigned"""
+        
+        def print_results(dataset):
+            exercises = dict()
+            
+            for row in dataset:
+                exercise_name = row[0]
+                student_name = f"{row[1]} {row[2]}"
+                
+                if exercise_name not in exercises:
+                    exercises[exercise_name] = [student_name]
+                else:
+                    exercises[exercise_name].append(student_name)
+                    
+            for exercise_name, students in exercises.items():
+                print(exercise_name)
+                for student in students:
+                    print(f"\t- {student}")
+        
+        query = """
+            SELECT 
+                e.Name,
+                s.FirstName,
+                s.LastName
+            FROM Exercise e
+            JOIN StudentExercise se ON se.ExerciseId = e.Id
+            JOIN Student s ON se.StudentId = s.Id
+            ORDER BY e.Id;
+        """
+        
+        row_factory = None
+        
+        response = self.get_data(row_factory, query)
+        print("========== POPULAR EXERCISES ==========")
+        print_results(response)
 
 reports = StudentExerciseReports()
 # reports.all_students()
@@ -231,4 +268,5 @@ reports = StudentExerciseReports()
 # reports.all_instructors()
 # reports.students_per_exercise()
 # reports.student_workload()
-reports.assigned_exercises()
+# reports.assigned_exercises()
+reports.popular_exercises()
