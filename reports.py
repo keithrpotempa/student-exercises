@@ -128,15 +128,15 @@ class StudentExerciseReports():
                     print(f'\t- {student}')
         
         query = f"""
-                select
-            e.Id ExerciseId,
-            e.Name,
-            s.Id,
-            s.FirstName,
-            s.LastName
-        from Exercise e
-        join StudentExercise se on se.ExerciseId = e.Id
-        join Student s on s.Id = se.StudentId
+            SELECT
+                e.Id ExerciseId,
+                e.Name,
+                s.Id,
+                s.FirstName,
+                s.LastName
+            FROM Exercise e
+            JOIN StudentExercise se ON se.ExerciseId = e.Id
+            JOIN Student s ON s.Id = se.StudentId
         """
         
         # There is no row_factory for this:
@@ -144,6 +144,42 @@ class StudentExerciseReports():
         row_factory = None
         
         response = self.get_data(row_factory, query)
+        print_results(response)
+
+    def student_workload(self):
+        """List the exercises assigned to each student"""
+        def print_results(dataset):
+            students = dict()
+            
+            for row in dataset:
+                student_name = f"{row[0]} {row[1]}"
+                exercise_name = row[2] 
+                
+                if student_name not in students:
+                    students[student_name] = [exercise_name]
+                else:
+                    students[student_name].append(exercise_name)
+                    
+            for student_name, exercises in students.items():
+                print(student_name)
+                for exercise in exercises:
+                    print(f"\t- {exercise}")
+                
+
+        query = """
+            SELECT
+                s.FirstName,
+                s.LastName,
+                e.name AS ExerciseName
+            FROM Exercise e
+            JOIN StudentExercise se ON se.ExerciseId = e.Id
+            Join Student s ON s.Id = se.StudentId;
+        """
+        
+        row_factory = None
+        
+        response = self.get_data(row_factory, query)
+        print("========== STUDENT WORKLOAD ==========")
         print_results(response)
 
 reports = StudentExerciseReports()
@@ -154,4 +190,5 @@ reports = StudentExerciseReports()
 # reports.exercises_from_language("Python")
 # reports.exercises_from_language("C#")
 # reports.all_instructors()
-reports.students_per_exercise()
+# reports.students_per_exercise()
+reports.student_workload()
