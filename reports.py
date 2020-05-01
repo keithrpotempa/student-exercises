@@ -182,6 +182,45 @@ class StudentExerciseReports():
         print("========== STUDENT WORKLOAD ==========")
         print_results(response)
 
+    def assigned_exercises(self):
+        """List all exercises assigned by each instructor"""
+        def print_results(dataset):
+            instructors = dict()
+            
+            for row in dataset:
+                instructor_name = f"{row[0]} {row[1]}"
+                exercise_name = row[3]
+                
+                if instructor_name not in instructors:
+                    instructors[instructor_name] = [exercise_name]
+                else:
+                    # Note: this one has an extra if statement 
+                    # to make sure not to repeat exercises. 
+                    # Likely should have been handled in the SQL query though
+                    if exercise_name not in instructors[instructor_name]:
+                        instructors[instructor_name].append(exercise_name)
+            
+            for instructor_name, exercises in instructors.items():
+                print(instructor_name)
+                for exercise in exercises:
+                     print(f"\t- {exercise}")
+        
+        query = """SELECT 
+            i.FirstName,
+            i.LastName,
+            se.ExerciseId as ExerciseId,
+            e.Name as ExerciseName
+        FROM Instructor i
+        JOIN StudentExercise se ON se.InstructorId = i.Id
+        JOIN Exercise e ON se.ExerciseId = e.Id;
+        """
+        
+        row_factory = None
+        
+        response = self.get_data(row_factory, query)
+        print("========== ASSIGNED EXERCISES ==========")
+        print_results(response)
+
 reports = StudentExerciseReports()
 # reports.all_students()
 # reports.all_cohorts()
@@ -191,4 +230,5 @@ reports = StudentExerciseReports()
 # reports.exercises_from_language("C#")
 # reports.all_instructors()
 # reports.students_per_exercise()
-reports.student_workload()
+# reports.student_workload()
+reports.assigned_exercises()
