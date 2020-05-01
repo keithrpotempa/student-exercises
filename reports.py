@@ -20,11 +20,13 @@ class StudentExerciseReports():
             db_cursor.execute(query)
             response = db_cursor.fetchall()
             
-            if len(response) > 0:
-              for row in response:
-                  print(f"  - {row}")
-            else:
-              print("   - None")
+        return response
+            
+            # if len(response) > 0:
+            #   for row in response:
+            #       print(f"  - {row}")
+            # else:
+            #   print("   - None")
 
     def all_students(self):
         """Retrieve all students with the cohort name"""
@@ -46,7 +48,12 @@ class StudentExerciseReports():
             """
             
         print(f"All Students:")
-        self.report(row_factory, query)
+        response = self.report(row_factory, query)
+        if len(response) > 0:
+            for row in response:
+                print(f"  - {row}")
+        else:
+            print("   - None")
         print("")
                 
     def all_cohorts(self):
@@ -144,11 +151,11 @@ class StudentExerciseReports():
         
 
 reports = StudentExerciseReports()
-# reports.all_students()
+reports.all_students()
 # reports.all_cohorts()
 # reports.all_exercises()
 # reports.exercises_from_language("JavaScript")
 # reports.exercises_from_language("Python")
 # reports.exercises_from_language("C#")
 # reports.all_instructors()
-reports.students_per_exercise()
+# reports.students_per_exercise()
