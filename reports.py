@@ -89,7 +89,7 @@ class StudentExerciseReports():
         self.report(row_factory, query)
         print("")
         
-    # FIXME: The methods from here on down don't seem quite right to me, 
+    # FIXME: this method doesn't seem quite right to me, 
     # considering we've already all the exercise data over to python instances
     # we shouldn't be making duplicate instances...
     def exercises_from_language(self, language):
@@ -103,12 +103,52 @@ class StudentExerciseReports():
         print(f"Exercises in {language} include:")
         self.report(row_factory, query)
         print("")
+        
+    def students_per_exercise(self):
+        """Retrieve all exercises and the students working on each"""
+        # Different enough from other reports as to not utilize the report method
+        exercises = dict()
+
+        with sqlite3.connect(self.db_path) as conn:
+            db_cursor = conn.cursor()
+        
+        db_cursor.execute("""
+                select
+            e.Id ExerciseId,
+            e.Name,
+            s.Id,
+            s.FirstName,
+            s.LastName
+        from Exercise e
+        join StudentExercise se on se.ExerciseId = e.Id
+        join Student s on s.Id = se.StudentId
+        """)
+        
+        dataset = db_cursor.fetchall()
+        
+        for row in dataset:
+            exercise_id = row[0]
+            exercise_name = row[1]
+            student_id = row[2]
+            student_name = f'{row[3]} {row[4]}'
+            
+            if exercise_name not in exercises:
+                exercises[exercise_name] = [student_name]
+            else:
+                exercises[exercise_name].append(student_name)
+                
+        for exercise_name, students in exercises.items():
+            print(exercise_name)
+            for student in students:
+                print(f'\t- {student}')
+        
 
 reports = StudentExerciseReports()
-reports.all_students()
-reports.all_cohorts()
-reports.all_exercises()
-reports.exercises_from_language("JavaScript")
-reports.exercises_from_language("Python")
-reports.exercises_from_language("C#")
-reports.all_instructors()
+# reports.all_students()
+# reports.all_cohorts()
+# reports.all_exercises()
+# reports.exercises_from_language("JavaScript")
+# reports.exercises_from_language("Python")
+# reports.exercises_from_language("C#")
+# reports.all_instructors()
+reports.students_per_exercise()
