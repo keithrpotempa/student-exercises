@@ -258,6 +258,49 @@ class StudentExerciseReports():
         print("========== POPULAR EXERCISES ==========")
         print_results(response)
 
+    def who_what_why(self):
+        """Lists students working on each exercise and includes the instructor who assigned it"""
+        
+        def print_results(dataset):
+            exercises = dict()
+            
+            for row in dataset:
+                exercise_name = row[0]
+                student_name = f"{row[1]} {row[2]}"
+                instructor_name = f"{row[3]} {row[4]}"
+                message = f"{instructor_name} assigned this to {student_name}"
+                
+                if exercise_name not in exercises:
+                    exercises[exercise_name] = [message]
+                else:
+                    exercises[exercise_name].append(message)
+                    
+            for exercise_name, messages in exercises.items():
+                print(exercise_name)
+                for message in messages:
+                    print(f"\t- {message}")
+        
+        query = """
+            SELECT 
+                e.Name,
+                s.FirstName AS StuFName,
+                s.LastName AS StuLName,
+                i.FirstName AS InstFName,
+                i.LastName AS InstLName
+            FROM Exercise e
+            JOIN StudentExercise se ON se.ExerciseId = e.Id
+            JOIN Student s ON se.StudentId = s.Id
+            JOIN Instructor i ON se.InstructorId = i.Id
+            ORDER BY e.Id;
+        """
+        
+        row_factory = None
+        
+        response = self.get_data(row_factory, query)
+        print("========== WHO WHAT WHY ==========")
+        print_results(response)
+        
+
 reports = StudentExerciseReports()
 # reports.all_students()
 # reports.all_cohorts()
@@ -269,4 +312,5 @@ reports = StudentExerciseReports()
 # reports.students_per_exercise()
 # reports.student_workload()
 # reports.assigned_exercises()
-reports.popular_exercises()
+# reports.popular_exercises()
+reports.who_what_why()
